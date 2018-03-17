@@ -55,6 +55,8 @@ namespace Simple_LSB_Steganography
                     MessageBox.Show("Не получилось открыть изображение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
+
+            btnDecodeMessage_Click(sender, e);
         }
 
         private void tsmSaveResult_Click(object sender, EventArgs e)
@@ -68,7 +70,7 @@ namespace Simple_LSB_Steganography
 
             saveFileDialog.DefaultExt = "png";
             saveFileDialog.Filter = string.Format("Image|*.{0}", "png");
-            saveFileDialog.FileName = openFileDialog.FileName;
+            saveFileDialog.FileName = string.Format("{0}_stego", openFileDialog.FileName);
             DialogResult choice = saveFileDialog.ShowDialog();
             if (choice == DialogResult.OK)
             {
@@ -100,8 +102,15 @@ namespace Simple_LSB_Steganography
             byte[] binMessage = StringConverter.StringToBin(tbInputText.Text);
             Algorithm algorithm = new LSB();
             _resultImage = algorithm.PutMessage(_originalImage, binMessage);
-            pboxResult.Image = Image.FromStream(_resultImage);
 
+            if (_resultImage == null)
+            {
+                MessageBox.Show("Не получилось вложить сообщение. Попробуйте уменьшить длину сообщения.", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            pboxResult.Image = Image.FromStream(_resultImage);
             btnDecodeMessage_Click(sender, e);
         }
 
@@ -113,10 +122,17 @@ namespace Simple_LSB_Steganography
                 return;
             }
 
-            Algorithm algorithm = new LSB();
-            byte[] binMessage = algorithm.GetMessage(_resultImage);
-            string message = StringConverter.BinToString(binMessage);
-            tbOutputText.Text = message;
+            try
+            {
+                Algorithm algorithm = new LSB();
+                byte[] binMessage = algorithm.GetMessage(_resultImage);
+                string message = StringConverter.BinToString(binMessage);
+                tbOutputText.Text = message;
+            }
+            catch
+            {
+                MessageBox.Show("Не удалось извлечь сообщение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
     }
 }

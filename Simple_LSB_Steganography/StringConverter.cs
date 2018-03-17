@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Simple_LSB_Steganography
 {
@@ -10,12 +6,12 @@ namespace Simple_LSB_Steganography
     {
         public static byte[] StringToBin(string parString)
         {
-            return null;
+            return Encoding.Unicode.GetBytes(parString);
         }
 
         public static string BinToString(byte[] parBin)
         {
-            return null;
+            return Encoding.Unicode.GetString(parBin);
         }
     }
 }
