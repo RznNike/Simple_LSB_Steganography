@@ -36,11 +36,11 @@
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnDecodeMessage = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.tbOutputText = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tbInputText = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.pboxOriginal = new System.Windows.Forms.PictureBox();
             this.pboxResult = new System.Windows.Forms.PictureBox();
@@ -127,6 +127,7 @@
             this.tsmOpenImageToDecode.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
             this.tsmOpenImageToDecode.Size = new System.Drawing.Size(287, 22);
             this.tsmOpenImageToDecode.Text = "Открыть изображение с кодом";
+            this.tsmOpenImageToDecode.Click += new System.EventHandler(this.tsmOpenImageToDecode_Click);
             // 
             // tsmSaveResult
             // 
@@ -198,11 +199,11 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.groupBox1, 5);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.btnDecodeMessage);
             this.groupBox1.Controls.Add(this.label12);
-            this.groupBox1.Controls.Add(this.textBox2);
+            this.groupBox1.Controls.Add(this.tbOutputText);
             this.groupBox1.Controls.Add(this.label7);
-            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.tbInputText);
             this.groupBox1.Location = new System.Drawing.Point(3, 395);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(768, 114);
@@ -210,14 +211,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Параметры:";
             // 
-            // button1
+            // btnDecodeMessage
             // 
-            this.button1.Location = new System.Drawing.Point(152, 61);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(244, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Декодировать сообщение из второго окна";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnDecodeMessage.Location = new System.Drawing.Point(152, 61);
+            this.btnDecodeMessage.Name = "btnDecodeMessage";
+            this.btnDecodeMessage.Size = new System.Drawing.Size(285, 23);
+            this.btnDecodeMessage.TabIndex = 4;
+            this.btnDecodeMessage.Text = "Декодировать сообщение из второго изображения";
+            this.btnDecodeMessage.UseVisualStyleBackColor = true;
+            this.btnDecodeMessage.Click += new System.EventHandler(this.btnDecodeMessage_Click);
             // 
             // label12
             // 
@@ -228,14 +230,15 @@
             this.label12.TabIndex = 3;
             this.label12.Text = "Результат декодирования:";
             // 
-            // textBox2
+            // tbOutputText
             // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbOutputText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(9, 84);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(753, 20);
-            this.textBox2.TabIndex = 2;
+            this.tbOutputText.Location = new System.Drawing.Point(9, 84);
+            this.tbOutputText.Name = "tbOutputText";
+            this.tbOutputText.ReadOnly = true;
+            this.tbOutputText.Size = new System.Drawing.Size(753, 20);
+            this.tbOutputText.TabIndex = 2;
             // 
             // label7
             // 
@@ -246,15 +249,15 @@
             this.label7.TabIndex = 1;
             this.label7.Text = "Кодируемое сообщение:";
             // 
-            // textBox1
+            // tbInputText
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbInputText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(9, 37);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(753, 20);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.Text = "Тест работы. 123, English text, /*-+!@#$%^&";
+            this.tbInputText.Location = new System.Drawing.Point(9, 37);
+            this.tbInputText.Name = "tbInputText";
+            this.tbInputText.Size = new System.Drawing.Size(753, 20);
+            this.tbInputText.TabIndex = 0;
+            this.tbInputText.Text = "Тест работы. 123, English text, /*-+!@#$%^&";
             // 
             // label1
             // 
@@ -675,11 +678,11 @@
         private System.Windows.Forms.NumericUpDown nudWaveletLevels;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ToolStripMenuItem tsmOpenImageToDecode;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnDecodeMessage;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox tbOutputText;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox tbInputText;
     }
 }
 
