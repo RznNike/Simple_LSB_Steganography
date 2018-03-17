@@ -43,7 +43,14 @@ namespace Simple_LSB_Steganography
                 {
                     int index = i * 8 + j;
                     int mask = (message[i] >> j) & 1 | (bitsImage[index] >> 1 << 1);
-                    bitsImage[index] &= mask;
+                    if (bitsImage[index] % 2 == 0)
+                    {
+                        bitsImage[index] |= mask;
+                    }
+                    else
+                    {
+                        bitsImage[index] &= mask;
+                    }
                 }
             }
             
