@@ -85,12 +85,12 @@ namespace Simple_LSB_Steganography
                 modifiedMessage = parMessage;
             }
 
-            for (int i = 0; i < parMessage.Length; i++)
+            for (int i = 0; i < modifiedMessage.Length; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     int index = i * 8 + j;
-                    int mask = (parMessage[i] >> j) & 1;
+                    int mask = (modifiedMessage[i] >> j) & 1;
                     parPixels[index] = (parPixels[index] >> 1 << 1) | mask;
                 }
             }
