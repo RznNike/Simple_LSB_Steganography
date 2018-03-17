@@ -14,67 +14,9 @@ namespace Simple_LSB_Steganography
         private Bitmap Image { get; set; }
         private BitmapData ImageData { get; set; }
 
-        private bool AreCharsEqual(byte[] parChar1, byte[] parChar2)
+        protected override int[] StreamToPixels(Stream parImage)
         {
-            return Encoding.Unicode.GetChars(parChar1)[0] == Encoding.Unicode.GetChars(parChar2)[0];
-        }
-
-        private void FixPixelFormat(Bitmap parImage)
-        {
-            if (parImage.PixelFormat != PixelFormat.Format32bppArgb)
-            {
-                parImage = parImage.Clone(new Rectangle(0, 0, parImage.Width, parImage.Height), PixelFormat.Format32bppArgb);
-            }
-        }
-
-        protected override Stream ToStream(int[] pixels)
-        {
-            ReleaseImage(pixels);
-
-            Stream result = new MemoryStream();
-            Image.Save(result, ImageFormat.Bmp);
-
-            return result;
-        }
-
-        private void ReleaseImage(int[] pixels)
-        {
-            Marshal.Copy(pixels, 0, ImageData.Scan0, pixels.Length);
-            Image.UnlockBits(ImageData);
-        }
-
-        protected override void Encode(byte[] message, int[] pixels)
-        {
-            byte[] modifiedMessage;
-            if ((Image.Width * Image.Height) < (message.Length * 8))
-            {
-                return;
-            }
-            else if ((Image.Width * Image.Height) >= (message.Length * 8 + 2))
-            {
-                modifiedMessage = new byte[message.Length + 2];
-                message.CopyTo(modifiedMessage, 0);
-                TERMINATOR.CopyTo(modifiedMessage, message.Length);
-            }
-            else
-            {
-                modifiedMessage = message;
-            }
-
-            for (int i = 0; i < message.Length; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    int index = i * 8 + j;
-                    int mask = (message[i] >> j) & 1;
-                    pixels[index] = (pixels[index] >> 1 << 1) | mask;
-                }
-            }
-        }
-
-        protected override int[] GetPixels(Stream image)
-        {
-            Image = new Bitmap(image);
+            Image = new Bitmap(parImage);
             FixPixelFormat(Image);
 
             ImageData = Image.LockBits
@@ -89,11 +31,76 @@ namespace Simple_LSB_Steganography
             return pixels;
         }
 
-        internal override byte[] Decode(int[] pixels)
+        private void FixPixelFormat(Bitmap parImage)
+        {
+            if (parImage.PixelFormat != PixelFormat.Format32bppArgb)
+            {
+                parImage = parImage.Clone(new Rectangle(0, 0, parImage.Width, parImage.Height), PixelFormat.Format32bppArgb);
+            }
+        }
+
+        protected override Stream PixelsToStream(int[] parPixels)
+        {
+            Stream result;
+
+            try
+            {
+                ReleaseImage(parPixels, true);
+                result = new MemoryStream();
+                Image.Save(result, ImageFormat.Bmp);
+            }
+            catch
+            {
+                result = null;
+            }
+
+            return result;
+        }
+
+        private void ReleaseImage(int[] parPixels, bool parApplyChanges)
+        {
+            if (parApplyChanges)
+            {
+                Marshal.Copy(parPixels, 0, ImageData.Scan0, parPixels.Length);
+            }
+            Image.UnlockBits(ImageData);
+        }
+
+        protected override void Encode(byte[] parMessage, int[] parPixels)
+        {
+            byte[] modifiedMessage;
+            if ((Image.Width * Image.Height) < (parMessage.Length * 8))
+            {
+                Image = null;
+                return;
+            }
+            else if ((Image.Width * Image.Height) >= (parMessage.Length * 8 + 2))
+            {
+                modifiedMessage = new byte[parMessage.Length + 2];
+                parMessage.CopyTo(modifiedMessage, 0);
+                TERMINATOR.CopyTo(modifiedMessage, parMessage.Length);
+            }
+            else
+            {
+                modifiedMessage = parMessage;
+            }
+
+            for (int i = 0; i < parMessage.Length; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    int index = i * 8 + j;
+                    int mask = (parMessage[i] >> j) & 1;
+                    parPixels[index] = (parPixels[index] >> 1 << 1) | mask;
+                }
+            }
+        }
+        
+        protected override byte[] Decode(int[] parPixels)
         {
             List<byte> message = new List<byte>();
 
-            for (int i = 0; i < pixels.Length / 16; i++)
+            for (int i = 0; i < parPixels.Length / 16; i++)
             {
                 byte[] currentChar = new byte[2] { 0, 0 };
                 for (int k = 0; k < 2; k++)
@@ -101,7 +108,7 @@ namespace Simple_LSB_Steganography
                     for (int j = 0; j < 8; j++)
                     {
                         int index = (2 * i + k) * 8 + j;
-                        int bit = (pixels[index] & 1);
+                        int bit = (parPixels[index] & 1);
                         currentChar[k] |= (byte)(bit << j);
                     }
                 }
@@ -114,9 +121,14 @@ namespace Simple_LSB_Steganography
                     message.AddRange(currentChar);
                 }
             }
-            ReleaseImage(pixels);
+            ReleaseImage(parPixels, false);
 
             return message.ToArray();
+        }
+
+        private bool AreCharsEqual(byte[] parChar1, byte[] parChar2)
+        {
+            return Encoding.Unicode.GetChars(parChar1)[0] == Encoding.Unicode.GetChars(parChar2)[0];
         }
     }
 }

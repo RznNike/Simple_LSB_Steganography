@@ -4,40 +4,42 @@ namespace Simple_LSB_Steganography
 {
     public abstract class Algorithm
     {
-        public Stream PutMessage(Stream memorizedImage, byte[] parMessage)
+        public Stream PutMessage(Stream parImage, byte[] parMessage)
         {
-            int[] pixels = GetPixels(memorizedImage);
+            int[] pixels = StreamToPixels(parImage);
             Encode(parMessage, pixels);
 
-            return ToStream(pixels);
+            return PixelsToStream(pixels);
+        }
+
+        public byte[] GetMessage(Stream parImage)
+        {
+            int[] pixels = StreamToPixels(parImage);
+
+            return Decode(pixels);
         }
 
         /// <summary>
         /// Writes pixels to an image
         /// </summary>
-        /// <param name="pixels">Pixels of an original image</param>
+        /// <param name="parPixels">Pixels of an original image</param>
         /// <returns></returns>
-        protected abstract Stream ToStream(int[] pixels);
+        protected abstract Stream PixelsToStream(int[] parPixels);
+
         /// <summary>
-        /// Encodes the <paramref name="message"/> to the <paramref name="pixels"/>
+        /// Encodes the <paramref name="parMessage"/> to the <paramref name="parPixels"/>
         /// </summary>
-        /// <param name="message">Message to be encoded</param>
-        /// <param name="pixels">Pixels of an original image</param>
-        protected abstract void Encode(byte[] message, int[] pixels);
+        /// <param name="parMessage">Message to be encoded</param>
+        /// <param name="parPixels">Pixels of an original image</param>
+        protected abstract void Encode(byte[] parMessage, int[] parPixels);
+
         /// <summary>
-        /// Executes pixels from the <paramref name="image"/>
+        /// Executes pixels from the <paramref name="parImage"/>
         /// </summary>
-        /// <param name="image">Container of a message</param>
+        /// <param name="parImage">Container of a message</param>
         /// <returns></returns>
-        protected abstract int[] GetPixels(Stream image);
+        protected abstract int[] StreamToPixels(Stream parImage);
 
-        public byte[] GetMessage(Stream image)
-        {
-            int[] pixels = GetPixels(image);
-
-            return Decode(pixels);
-        }
-
-        internal abstract byte[] Decode(int[] pixels);
+        protected abstract byte[] Decode(int[] parPixels);
     }
 }
