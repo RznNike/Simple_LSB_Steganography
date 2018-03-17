@@ -16,6 +16,8 @@ namespace Simple_LSB_Steganography
             Bitmap image = new Bitmap(parImage);
             byte[] message;
 
+            FixPixelFormat(ref image);
+
             if ((image.Width * image.Height) < (parMessage.Length * 8))
             {
                 return null;
@@ -42,15 +44,8 @@ namespace Simple_LSB_Steganography
                 for (int j = 0; j < 8; j++)
                 {
                     int index = i * 8 + j;
-                    int mask = (message[i] >> j) & 1 | (bitsImage[index] >> 1 << 1);
-                    if (bitsImage[index] % 2 == 0)
-                    {
-                        bitsImage[index] |= mask;
-                    }
-                    else
-                    {
-                        bitsImage[index] &= mask;
-                    }
+                    int mask = (message[i] >> j) & 1;
+                    bitsImage[index] = (bitsImage[index] >> 1 << 1) | mask;
                 }
             }
             
@@ -103,6 +98,14 @@ namespace Simple_LSB_Steganography
         private bool IsCharsEqual(byte[] parChar1, byte[] parChar2)
         {
             return Encoding.Unicode.GetChars(parChar1)[0] == Encoding.Unicode.GetChars(parChar2)[0];
+        }
+
+        private void FixPixelFormat(ref Bitmap parImage)
+        {
+            if (parImage.PixelFormat != PixelFormat.Format32bppArgb)
+            {
+                parImage = parImage.Clone(new Rectangle(0, 0, parImage.Width, parImage.Height), PixelFormat.Format32bppArgb);
+            }
         }
     }
 }

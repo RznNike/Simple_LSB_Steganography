@@ -10,6 +10,7 @@ namespace Simple_LSB_Steganography
     {
         private Stream _originalImage = null;
         private Stream _resultImage = null;
+        private Algorithm _algorithm = new LSB();
 
         public MainForm()
         {
@@ -100,8 +101,7 @@ namespace Simple_LSB_Steganography
             }
 
             byte[] binMessage = StringConverter.StringToBin(tbInputText.Text);
-            Algorithm algorithm = new LSB();
-            _resultImage = algorithm.PutMessage(_originalImage, binMessage);
+            _resultImage = _algorithm.PutMessage(_originalImage, binMessage);
 
             if (_resultImage == null)
             {
@@ -124,8 +124,7 @@ namespace Simple_LSB_Steganography
 
             try
             {
-                Algorithm algorithm = new LSB();
-                byte[] binMessage = algorithm.GetMessage(_resultImage);
+                byte[] binMessage = _algorithm.GetMessage(_resultImage);
                 string message = StringConverter.BinToString(binMessage);
                 tbOutputText.Text = message;
             }
