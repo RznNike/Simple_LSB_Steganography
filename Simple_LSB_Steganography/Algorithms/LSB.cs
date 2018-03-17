@@ -11,64 +11,89 @@ namespace Simple_LSB_Steganography
     {
         private static readonly byte[] TERMINATOR = { 255, 255 };
 
-        public override Stream PutMessage(Stream parImage, byte[] parMessage)
+        private Bitmap Image { get; set; }
+        private BitmapData ImageData { get; set; }
+
+        private bool AreCharsEqual(byte[] parChar1, byte[] parChar2)
         {
-            Bitmap image = new Bitmap(parImage);
-            byte[] message;
+            return Encoding.Unicode.GetChars(parChar1)[0] == Encoding.Unicode.GetChars(parChar2)[0];
+        }
 
-            FixPixelFormat(ref image);
-
-            if ((image.Width * image.Height) < (parMessage.Length * 8))
+        private void FixPixelFormat(Bitmap parImage)
+        {
+            if (parImage.PixelFormat != PixelFormat.Format32bppArgb)
             {
-                return null;
+                parImage = parImage.Clone(new Rectangle(0, 0, parImage.Width, parImage.Height), PixelFormat.Format32bppArgb);
             }
-            else if ((image.Width * image.Height) >= (parMessage.Length * 8 + 2))
+        }
+
+        protected override Stream ToStream(int[] pixels)
+        {
+            ReleaseImage(pixels);
+
+            Stream result = new MemoryStream();
+            Image.Save(result, ImageFormat.Bmp);
+
+            return result;
+        }
+
+        private void ReleaseImage(int[] pixels)
+        {
+            Marshal.Copy(pixels, 0, ImageData.Scan0, pixels.Length);
+            Image.UnlockBits(ImageData);
+        }
+
+        protected override void Encode(byte[] message, int[] pixels)
+        {
+            byte[] modifiedMessage;
+            if ((Image.Width * Image.Height) < (message.Length * 8))
             {
-                message = new byte[parMessage.Length + 2];
-                parMessage.CopyTo(message, 0);
-                TERMINATOR.CopyTo(message, parMessage.Length);
+                return;
+            }
+            else if ((Image.Width * Image.Height) >= (message.Length * 8 + 2))
+            {
+                modifiedMessage = new byte[message.Length + 2];
+                message.CopyTo(modifiedMessage, 0);
+                TERMINATOR.CopyTo(modifiedMessage, message.Length);
             }
             else
             {
-                message = parMessage;
+                modifiedMessage = message;
             }
 
-            BitmapData bdImage = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
-                                                      ImageLockMode.ReadWrite,
-                                                      PixelFormat.Format32bppArgb);
-            int[] bitsImage = new int[bdImage.Stride / 4 * bdImage.Height];
-            Marshal.Copy(bdImage.Scan0, bitsImage, 0, bitsImage.Length);
-            
             for (int i = 0; i < message.Length; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     int index = i * 8 + j;
                     int mask = (message[i] >> j) & 1;
-                    bitsImage[index] = (bitsImage[index] >> 1 << 1) | mask;
+                    pixels[index] = (pixels[index] >> 1 << 1) | mask;
                 }
             }
-            
-            Marshal.Copy(bitsImage, 0, bdImage.Scan0, bitsImage.Length);
-            image.UnlockBits(bdImage);
-
-            Stream result = new MemoryStream();
-            image.Save(result, ImageFormat.Bmp);
-            return result;
         }
 
-        public override byte[] GetMessage(Stream parImage)
+        protected override int[] GetPixels(Stream image)
         {
-            Bitmap image = new Bitmap(parImage);
+            Image = new Bitmap(image);
+            FixPixelFormat(Image);
+
+            ImageData = Image.LockBits
+            (
+                new Rectangle(0, 0, Image.Width, Image.Height),
+                ImageLockMode.ReadWrite,
+                PixelFormat.Format32bppArgb
+            );
+            int[] pixels = new int[ImageData.Width * ImageData.Height];
+            Marshal.Copy(ImageData.Scan0, pixels, 0, pixels.Length);
+
+            return pixels;
+        }
+
+        internal override byte[] Decode(int[] pixels)
+        {
             List<byte> message = new List<byte>();
 
-            BitmapData bdImage = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
-                                                      ImageLockMode.ReadWrite,
-                                                      PixelFormat.Format32bppArgb);
-            int[] bitsImage = new int[bdImage.Stride / 4 * bdImage.Height];
-            Marshal.Copy(bdImage.Scan0, bitsImage, 0, bitsImage.Length);
-
-            for (int i = 0; i < bitsImage.Length / 16; i++)
+            for (int i = 0; i < pixels.Length / 16; i++)
             {
                 byte[] currentChar = new byte[2] { 0, 0 };
                 for (int k = 0; k < 2; k++)
@@ -76,11 +101,11 @@ namespace Simple_LSB_Steganography
                     for (int j = 0; j < 8; j++)
                     {
                         int index = (2 * i + k) * 8 + j;
-                        int bit = (bitsImage[index] & 1);
+                        int bit = (pixels[index] & 1);
                         currentChar[k] |= (byte)(bit << j);
                     }
                 }
-                if (IsCharsEqual(currentChar, TERMINATOR))
+                if (AreCharsEqual(currentChar, TERMINATOR))
                 {
                     break;
                 }
@@ -89,23 +114,9 @@ namespace Simple_LSB_Steganography
                     message.AddRange(currentChar);
                 }
             }
+            ReleaseImage(pixels);
 
-            image.UnlockBits(bdImage);
-           
             return message.ToArray();
-        }
-
-        private bool IsCharsEqual(byte[] parChar1, byte[] parChar2)
-        {
-            return Encoding.Unicode.GetChars(parChar1)[0] == Encoding.Unicode.GetChars(parChar2)[0];
-        }
-
-        private void FixPixelFormat(ref Bitmap parImage)
-        {
-            if (parImage.PixelFormat != PixelFormat.Format32bppArgb)
-            {
-                parImage = parImage.Clone(new Rectangle(0, 0, parImage.Width, parImage.Height), PixelFormat.Format32bppArgb);
-            }
         }
     }
 }
