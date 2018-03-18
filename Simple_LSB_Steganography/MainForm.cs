@@ -6,60 +6,93 @@ using System.Windows.Forms;
 
 namespace Simple_LSB_Steganography
 {
+    /// <summary>
+    /// Форма приложения
+    /// </summary>
     public partial class MainForm : Form
     {
+        /// <summary>
+        /// Оригинальное изображение
+        /// </summary>
         private Stream _originalImage = null;
+
+        /// <summary>
+        /// Изображение со сскрытым сообщением
+        /// </summary>
         private Stream _resultImage = null;
+
+        /// <summary>
+        /// Реализация стеганографического алгоритма
+        /// </summary>
         private Algorithm _algorithm = new LSB();
 
+        /// <summary>
+        /// Конструктор формы
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Обработка нажатия на кнопку выхода
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsmExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
+        /// <summary>
+        /// Обработка нажатия на кнопку открытия исходного изображения
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsmOpenImage_Click(object sender, EventArgs e)
         {
-            openFileDialog.Multiselect = false;
-            DialogResult choice = openFileDialog.ShowDialog();
-            if (choice == DialogResult.OK)
-            {
-                try
-                {
-                    _originalImage = new MemoryStream(File.ReadAllBytes(openFileDialog.FileName));
-                    pboxOriginal.Image = new Bitmap(_originalImage);
-                }
-                catch
-                {
-                    MessageBox.Show("Не получилось открыть изображение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-            }
+            LoadImage(ref _originalImage, pboxOriginal);
         }
 
+        /// <summary>
+        /// Обработка нажатия на кнопку открытия изображения со скрытым сообением
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsmOpenImageToDecode_Click(object sender, EventArgs e)
         {
-            openFileDialog.Multiselect = false;
-            DialogResult choice = openFileDialog.ShowDialog();
-            if (choice == DialogResult.OK)
-            {
-                try
-                {
-                    _resultImage = new MemoryStream(File.ReadAllBytes(openFileDialog.FileName));
-                    pboxResult.Image = new Bitmap(_resultImage);
-                }
-                catch
-                {
-                    MessageBox.Show("Не получилось открыть изображение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-            }
-
+            LoadImage(ref _resultImage, pboxResult);
             btnDecodeMessage_Click(sender, e);
         }
 
+        /// <summary>
+        /// Загрузка изображения в память и на форму
+        /// </summary>
+        /// <param name="refImageStream">Переменная для хранения изображения</param>
+        /// <param name="parPictureBox">PictureBox для показа изображения</param>
+        private void LoadImage(ref Stream refImageStream, PictureBox parPictureBox)
+        {
+            openFileDialog.Multiselect = false;
+            DialogResult choice = openFileDialog.ShowDialog();
+            if (choice == DialogResult.OK)
+            {
+                try
+                {
+                    refImageStream = new MemoryStream(File.ReadAllBytes(openFileDialog.FileName));
+                    parPictureBox.Image = new Bitmap(refImageStream);
+                }
+                catch
+                {
+                    MessageBox.Show("Не получилось открыть изображение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Обработка нажатия на кнопку сохранения результата. Сохранение в PNG.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsmSaveResult_Click(object sender, EventArgs e)
         {
             if (_resultImage == null)
@@ -87,6 +120,11 @@ namespace Simple_LSB_Steganography
             }
         }
 
+        /// <summary>
+        /// Обработка нажатия на кнопку применения алгоритма
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsmApplyAlgorithm_Click(object sender, EventArgs e)
         {
             if (_originalImage == null)
@@ -114,6 +152,11 @@ namespace Simple_LSB_Steganography
             btnDecodeMessage_Click(sender, e);
         }
 
+        /// <summary>
+        /// Обработка нажатия на кнопку извлечения сообщения из изображения
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnDecodeMessage_Click(object sender, EventArgs e)
         {
             if (_resultImage == null)

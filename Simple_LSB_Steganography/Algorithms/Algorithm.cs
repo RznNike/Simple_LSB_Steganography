@@ -2,8 +2,17 @@
 
 namespace Simple_LSB_Steganography
 {
+    /// <summary>
+    /// Базовый класс алгоритмов стеганографии
+    /// </summary>
     public abstract class Algorithm
     {
+        /// <summary>
+        /// Помещение сообщения в изображение
+        /// </summary>
+        /// <param name="parImage">Изображение-контейнер</param>
+        /// <param name="parMessage">Сообщение</param>
+        /// <returns>Изображение с помещенным в него сообщением</returns>
         public Stream PutMessage(Stream parImage, byte[] parMessage)
         {
             int[] pixels = StreamToPixels(parImage);
@@ -12,6 +21,11 @@ namespace Simple_LSB_Steganography
             return PixelsToStream(pixels);
         }
 
+        /// <summary>
+        /// Извлечение сообщения из изображения
+        /// </summary>
+        /// <param name="parImage">Изображение со скрытым в нем сообщением</param>
+        /// <returns>Сообщение</returns>
         public byte[] GetMessage(Stream parImage)
         {
             int[] pixels = StreamToPixels(parImage);
@@ -20,26 +34,31 @@ namespace Simple_LSB_Steganography
         }
 
         /// <summary>
-        /// Writes pixels to an image
+        /// Конвертация изображения (в потоке) в пиксели (массив чисел)
         /// </summary>
-        /// <param name="parPixels">Pixels of an original image</param>
-        /// <returns></returns>
+        /// <param name="parImage">Изображение</param>
+        /// <returns>Массив пикселей в числовом представлении</returns>
+        protected abstract int[] StreamToPixels(Stream parImage);
+
+        /// <summary>
+        /// Конвертация пикселей (массива чисел) в изображение (в потоке)
+        /// </summary>
+        /// <param name="parPixels">>Массив пикселей в числовом представлении</param>
+        /// <returns>Изображение</returns>
         protected abstract Stream PixelsToStream(int[] parPixels);
 
         /// <summary>
-        /// Encodes the <paramref name="parMessage"/> to the <paramref name="parPixels"/>
+        /// Кодирование битов сообщения внутри пикселей
         /// </summary>
-        /// <param name="parMessage">Message to be encoded</param>
-        /// <param name="parPixels">Pixels of an original image</param>
+        /// <param name="parMessage">Сообщение</param>
+        /// <param name="parPixels">Массив пикселей</param>
         protected abstract void Encode(byte[] parMessage, int[] parPixels);
 
         /// <summary>
-        /// Executes pixels from the <paramref name="parImage"/>
+        /// Декодирование битов сообщения из массива пикселей
         /// </summary>
-        /// <param name="parImage">Container of a message</param>
-        /// <returns></returns>
-        protected abstract int[] StreamToPixels(Stream parImage);
-
+        /// <param name="parPixels">Массив пикселей</param>
+        /// <returns>Сообщение</returns>
         protected abstract byte[] Decode(int[] parPixels);
     }
 }
