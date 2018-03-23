@@ -68,7 +68,7 @@ namespace Simple_LSB_Steganography
         /// <summary>
         /// Конвертация пикселей (массива чисел) в изображение (в потоке)
         /// </summary>
-        /// <param name="parPixels">>Массив пикселей в числовом представлении</param>
+        /// <param name="parPixels">Массив пикселей в числовом представлении</param>
         /// <returns>Изображение</returns>
         protected override Stream PixelsToStream(int[] parPixels)
         {

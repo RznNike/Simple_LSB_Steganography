@@ -72,6 +72,7 @@
             this.cmbFinalFormat = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.tsmAboutProgram = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -94,7 +95,8 @@
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsFile,
-            this.tsActions});
+            this.tsActions,
+            this.tsmAboutProgram});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(774, 24);
@@ -589,6 +591,13 @@
             this.label10.TabIndex = 0;
             this.label10.Text = "Final format:";
             // 
+            // tsmAboutProgram
+            // 
+            this.tsmAboutProgram.Name = "tsmAboutProgram";
+            this.tsmAboutProgram.Size = new System.Drawing.Size(94, 20);
+            this.tsmAboutProgram.Text = "О программе";
+            this.tsmAboutProgram.Click += new System.EventHandler(this.tsmAboutProgram_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -683,6 +692,7 @@
         private System.Windows.Forms.TextBox tbOutputText;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox tbInputText;
+        private System.Windows.Forms.ToolStripMenuItem tsmAboutProgram;
     }
 }
 

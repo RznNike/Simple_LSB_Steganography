@@ -176,5 +176,16 @@ namespace Simple_LSB_Steganography
                 MessageBox.Show("Не удалось извлечь сообщение.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
+        /// <summary>
+        /// Обработка нажатия на пункт меню "О программе"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tsmAboutProgram_Click(object sender, EventArgs e)
+        {
+            Form aboutForm = new AboutForm();
+            aboutForm.ShowDialog();
+        }
     }
 }

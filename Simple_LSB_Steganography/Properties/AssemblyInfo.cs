@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle( "ImageProcessingOnSharp" )]
-[assembly: AssemblyDescription( "" )]
+[assembly: AssemblyTitle("LSB Стеганография")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "ImageProcessingOnSharp" )]
-[assembly: AssemblyCopyright( "Copyright ©  2017" )]
+[assembly: AssemblyProduct("LSB Стеганография")]
+[assembly: AssemblyCopyright("Copyright Gigolaev A.V., Tyart N.A. ©  2017")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
